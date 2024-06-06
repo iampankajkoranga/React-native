@@ -1,14 +1,11 @@
-import {
-  View,
-  Text,
-  FlatList,
-  Image,
-} from 'react-native';
+import {View, Text, FlatList, Image} from 'react-native';
 import React from 'react';
 import {DUMMY_DATA_HOME} from '../../Constants/index';
+import BannerList from '../Banner/BannerList';
 
-const HomeRails = () => {
-  const renderItem = ({item, index}) => {
+const HomeRails = ({homepageData}) => {
+  const renderRail = ({item, index}) => {
+    // console.log('item=====>>>>>>>', item);
     return (
       <View
         key={index}
@@ -24,7 +21,7 @@ const HomeRails = () => {
         <Image
           style={{height: 120, width: 200}}
           source={{
-            uri: `https://dev-astro-datastore.videoready.tv/${item?.content?.posterImage}`,
+            uri: `${item?.image}`,
           }}
           resizeMode="stretch"
         />
@@ -32,34 +29,48 @@ const HomeRails = () => {
       </View>
     );
   };
+  const renderDyamimcRail = (item, index) => {
+    switch (item?.sectionType) {
+      case 'HERO_BANNER':
+        return (
+          // <BannerList
+          //   bannerData={item.contentEditorial}
+          //   key={`hero_banner${index}`}
+          // />
+          <View>
+            <Text>abc</Text>
+          </View>
+        );
+      case 'RAIL':
+        // console.log('123', item);
+        return (
+          <FlatList
+            horizontal
+            keyExtractor={(_, index) => `key_${index}`}
+            renderItem={renderRail}
+            data={item?.contentList}
+            contentContainerStyle={{}}
+          />
+        );
+
+      default:
+        return null;
+    }
+  };
 
   return (
     <View style={{flex: 1, margin: 10}}>
-      <View
-        style={{
-          height: 180,
-          width: '100%',
-          borderColor: 'green',
-          borderWidth: 1,
-          marginBottom: 20,
-        }}></View>
-
-      {DUMMY_DATA_HOME.data?.results?.map(item => {
-        return (
-          <>
-            <View style={{marginBottom: 5}}>
-              <Text>{item?.name}</Text>
-            </View>
-            <FlatList
-              horizontal
-              keyExtractor={(_, index) => `key_${index}`}
-              renderItem={renderItem}
-              data={item?.contentEditorial}
-              contentContainerStyle={{}}
-            />
-          </>
-        );
-      })}
+      {homepageData &&
+        homepageData?.map((item, index) => {
+          return (
+            <>
+              <View style={{marginBottom: 5}}>
+                <Text>{item?.title}</Text>
+              </View>
+              {renderDyamimcRail(item, index)}
+            </>
+          );
+        })}
     </View>
   );
 };
