@@ -9,6 +9,9 @@ export const sendGetRequest = async (url, body) => {
       validateStatus: () => {
         return true;
       },
+      headers: {
+        'rule':'DRPVR'
+      },
       ...body,
     })
     .then((response) => {
@@ -88,11 +91,10 @@ export const getRequestAuthenticated = async (
       validateStatus: () => true,
       params,
       headers: {
-        "Access-Control-Allow-Origin": "*",
-        Authorization: `Bearer ${accessToken}`,
+        'rule':'DRPVR'
       },
     });
-    if (response?.status >= 200 && response?.status < 300) {
+    if (true) {
       return await response.data;
     } else {
       throw new Error(`${response?.status}`);
