@@ -1,17 +1,19 @@
-import {View, Text, FlatList, Image} from 'react-native';
+import {View, Text, FlatList, Image, TouchableOpacity} from 'react-native';
 import React from 'react';
 import {DUMMY_DATA_HOME} from '../../Constants/index';
 import BannerList from '../Banner/BannerList';
+import {useNavigation} from '@react-navigation/native';
 
 const HomeRails = ({homepageData}) => {
-  const renderRail = ({item, index}) => {
-    // console.log('item=====>>>>>>>', item);
+  const navigation = useNavigation();
+  console.log('homepageData', homepageData);
+  const renderRail = (item, index, layoutType) => {
     return (
       <View
         key={index}
         style={{
-          height: item?.orientation == 'LANDSCAPE' ? 160 : 180,
-          width: item?.orientation == 'LANDSCAPE' ? 180 : 200,
+          height: layoutType == 'LANDSCAPE' ? 150 : 180,
+          width: layoutType == 'LANDSCAPE' ? 165 : 155,
           borderWidth: 1,
           marginRight: 10,
           borderRadius: 10,
@@ -19,13 +21,42 @@ const HomeRails = ({homepageData}) => {
           marginBottom: 15,
         }}>
         <Image
-          style={{height: 120, width: 200}}
-          source={{
-            uri: `${item?.image}`,
+          style={{
+            height: layoutType == 'LANDSCAPE' ? 150 : 180,
+            width: layoutType == 'LANDSCAPE' ? 165 : 155,
           }}
-          resizeMode="stretch"
+          source={{
+            uri: item?.image,
+          }}
+          //   resizeMode="stretch"
         />
-        <Text style={{margin: 8, fontSize: 14}}>{item?.content?.title}</Text>
+        <Text style={{margin: 8, fontSize: 14, marginBottom: 20}}>
+          {item?.title}
+        </Text>
+      </View>
+    );
+  };
+
+  const renderCircularRail = ({item}) => {
+    return (
+      <View style={{alignItems: 'center', marginRight: 20, marginBottom: 15}}>
+        <View
+          style={{
+            height: 70,
+            width: 70,
+            borderRadius: 35,
+            borderWidth: 1,
+            marginBottom: 15,
+          }}>
+          <Image
+            style={{height: 70, width: 70, borderRadius: 35}}
+            source={{
+              uri: `${item?.image}`,
+            }}
+            resizeMode="stretch"
+          />
+        </View>
+        <Text style={{fontSize: 14}}>{item?.title}</Text>
       </View>
     );
   };
@@ -41,14 +72,26 @@ const HomeRails = ({homepageData}) => {
             <Text>abc</Text>
           </View>
         );
+      case 'SHORTCUT_RAIL':
+        return (
+          <FlatList
+            horizontal
+            keyExtractor={(_, index) => `key_${index}`}
+            renderItem={renderCircularRail}
+            data={item?.contentList}
+            contentContainerStyle={{}}
+          />
+        );
       case 'RAIL':
         // console.log('123', item);
         return (
           <FlatList
             horizontal
             keyExtractor={(_, index) => `key_${index}`}
-            renderItem={renderRail}
-            data={item?.contentList}
+            renderItem={({item: contentItem, index}) =>
+              renderRail(contentItem, index, item?.layoutType)
+            }
+            data={item?.contentList?.slice(0, 8)}
             contentContainerStyle={{}}
           />
         );
@@ -59,13 +102,27 @@ const HomeRails = ({homepageData}) => {
   };
 
   return (
-    <View style={{flex: 1, margin: 10}}>
+    <View style={{flex: 1, margin: 12}}>
       {homepageData &&
         homepageData?.map((item, index) => {
+          //   console.log('length', item);
           return (
             <>
-              <View style={{marginBottom: 5}}>
+              <View
+                style={{
+                  marginBottom: 5,
+                  flexDirection: 'row',
+                  justifyContent: 'space-between',
+                }}>
                 <Text>{item?.title}</Text>
+                {item?.totalCount > 8 && (
+                  <TouchableOpacity
+                    onPress={() =>
+                      navigation.navigate('ViewAll', {data: item})
+                    }>
+                    <Text style={{color: 'red'}}>All</Text>
+                  </TouchableOpacity>
+                )}
               </View>
               {renderDyamimcRail(item, index)}
             </>
